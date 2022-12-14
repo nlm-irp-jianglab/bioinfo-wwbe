@@ -6,7 +6,7 @@
 ```
 git clone https://github.com/nlm-irp-jianglab/bioinfo-wwbe.git
 cd bioinfo-wwbe
-conda env update -f wwbe-pipeline/environment.yml --prune
+conda env update -f environment.yml --prune
 conda activate wwbe
 ```
 
@@ -22,12 +22,13 @@ docker build -t wwbe .
 
 Place paired-end fastq files in the folder `raw_data/`
 
-important: The script is set up for raw data files names `<sample_name>_1.fastq.gz`
+important: 
+
+* The script is set up for raw data files names `<sample_name>_1.fastq.gz`
+
+* This script is set up for samples sequenced with Swift amplicon panel `primer_info/`. For sequencing data with Artic protocol prepare primer files and added it the folder `primer_info/`.
 
 Process each sample with the following command line:
-
-This script is set up for samples sequenced with Swift amplicon panel. For sequencing data with Artic protocol prepare primer files as the ones listed in the files folder for Swift.
-
 
 ### Option 1: Using conda environment
 ```
@@ -45,9 +46,9 @@ This will output the following files
 * `<output>/vcffiles/<sample_name>.vcf` - final annotated VCF files
 * `<output>/vcffiles/<sample_name>.depth` - depth file
 * `<output>/tsvfiles/<sample_name>_trimmed_union_snpEff_final.tsv` - tsv file formatted from final VCF files with variants associated with primer bias removed
-* `<output>/fastqfiles/<sample_name>_1.fq.gz` - fastq files generated from the final alingment bam file - only aligned reads
-* `<output>/fastqfiles/<sample_name>_2.fq.gz`
-* `<output>/freyja/<sample_name>.freyja`
+* `<output>/fastqfiles/<sample_name>_1.fq.gz` - fastq files generated from the final alingment bam file - only forward aligned reads
+* `<output>/fastqfiles/<sample_name>_2.fq.gz` - fastq files generated from the final alingment bam file - only reverse aligned reads
+* `<output>/freyja/<sample_name>.freyja` - output file from freyja
 
 ## 3. Recover relative lineage abundances using [Freyja](https://github.com/andersen-lab/Freyja)
 
@@ -59,5 +60,14 @@ freyja aggregate freyja/ --output [aggregated-filename.tsv]
 This will output the following files
 * `[aggregated-filename.tsv]` - freyja aggregated output
 
-## 4. Ordination analysis with [CoV-Dist](https://github.com/nlm-irp-jianglab/CoV-Dist)
+## 4. Ordination analysis with [CoVdist](https://github.com/nlm-irp-jianglab/CoVdist)
 
+git clone https://github.com/nlm-irp-jianglab/CoVdist.git
+
+Files from processing used by CoVdist:
+* `<output>/vcffiles/<sample_name>.vcf`
+* `<output>/vcffiles/<sample_name>.depth`
+
+input file: A prefix <sample_name> list file
+
+For usage: visit the github repository
