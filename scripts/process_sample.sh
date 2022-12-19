@@ -3,11 +3,11 @@ set -euo pipefail
 IFS=$'\n\t'
 
 sample=$1
-output=${2:-"output/"}
+output=${2:-"output"}
 primerBed=${3:-"primer_info/swift_primers_v2.bed"}
 primerInfo=${4:-"primer_info/swift_primers_v2_info.tsv"}
 cpu=${5:-16}
-
+raw_data=/gpfs/gsfs12/users/Irp-jiang/share/covid_data/WWBE/batch12_2022-12-12
 
 genome=data/NC_045512.2.fasta
 mkdir -p ${output}/bamfiles ${output}/vcffiles ${output}/tsvfiles ${output}/fastqfiles ${output}/freyja
@@ -16,7 +16,7 @@ mkdir -p ${output}/bamfiles ${output}/vcffiles ${output}/tsvfiles ${output}/fast
 #      Align sample reads to SARS-CoV-2 reference        #
 ##########################################################
 
-bwa mem -t ${cpu} -v 1 ${genome} raw_data/${sample}_1.fastq.gz raw_data/${sample}_2.fastq.gz | samtools view -@ ${cpu} -b -f 1 -F 268 -q 20 -s 1.0 | samtools sort -@ ${cpu} -o ${output}/bamfiles/${sample}.sorted.bam
+bwa mem -t ${cpu} -v 1 ${genome} ${raw_data}/${sample}_1.fastq.gz ${raw_data}/${sample}_2.fastq.gz | samtools view -@ ${cpu} -b -f 1 -F 268 -q 20 -s 1.0 | samtools sort -@ ${cpu} -o ${output}/bamfiles/${sample}.sorted.bam
 echo "Sample was initially aligned with BWA"
 
 if [ ! -f ${output}/bamfiles/${sample}.sorted.bam ]; then
@@ -57,7 +57,7 @@ lofreq call --min-cov 5 --max-depth 1000000 -q 30 -Q 30 -e --min-mq 20 --sig 0.0
 echo "First round of variant call with lofreq finished"
 
 if [ -z "$(grep -v '^#' ${output}/vcffiles/${sample}_trimmed.vcf)" ]; then
-    echo -e "\nNo variants found in file ${sample}_trimmed.vcf!\n"
+    echo -e "\nNo variants found in file ${sample}_trimmed.vcf! Processing stopped.\n"
     exit 0
 fi
 
@@ -76,11 +76,12 @@ ivar removereads -i ${output}/bamfiles/${sample}.trimmed.realigned.indelqual.bam
 echo "Bias reads removed with ivar"
 
 if [ ! -s ${output}/${sample}_primer_mismatchers_indices.txt ]; then
-    echo -e "\nNo primer bias - empty primer_mismatcher_indices file!\n"
+    echo -e "\nNo primer bias - empty primer_mismatcher_indices file!\n"; else
+    rm ${output}/${sample}_primer_mismatchers_indices_v2.txt
 fi
 
 rm ${output}/${sample}_primer_mismatchers_indices.txt
-rm ${output}/${sample}_primer_mismatchers_indices_v2.txt
+
 
 ##########################################################
 #     Final variant call after removal of bias reads     #
