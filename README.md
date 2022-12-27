@@ -70,4 +70,4 @@ Files from processing used by CoVdist:
 
 input file: A prefix <sample_name> list file
 
-For usage: visit the github repository
+[For detailed usage: visit the CoVdist repository](https://github.com/nlm-irp-jianglab/CoVdist)
