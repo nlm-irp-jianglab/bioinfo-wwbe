@@ -7,7 +7,6 @@ output=${2:-"output"}
 primerBed=${3:-"primer_info/swift_primers_v2.bed"}
 primerInfo=${4:-"primer_info/swift_primers_v2_info.tsv"}
 cpu=${5:-16}
-raw_data=/gpfs/gsfs12/users/Irp-jiang/share/covid_data/WWBE/batch12_2022-12-12
 
 genome=data/NC_045512.2.fasta
 mkdir -p ${output}/bamfiles ${output}/vcffiles ${output}/tsvfiles ${output}/fastqfiles ${output}/freyja
@@ -16,7 +15,7 @@ mkdir -p ${output}/bamfiles ${output}/vcffiles ${output}/tsvfiles ${output}/fast
 #      Align sample reads to SARS-CoV-2 reference        #
 ##########################################################
 
-bwa mem -t ${cpu} -v 1 ${genome} ${raw_data}/${sample}_1.fastq.gz ${raw_data}/${sample}_2.fastq.gz | samtools view -@ ${cpu} -b -f 1 -F 268 -q 20 -s 1.0 | samtools sort -@ ${cpu} -o ${output}/bamfiles/${sample}.sorted.bam
+bwa mem -t ${cpu} -v 1 ${genome} raw_data/${sample}_1.fastq.gz raw_data/${sample}_2.fastq.gz | samtools view -@ ${cpu} -b -f 1 -F 268 -q 20 -s 1.0 | samtools sort -@ ${cpu} -o ${output}/bamfiles/${sample}.sorted.bam
 echo "Sample was initially aligned with BWA"
 
 if [ ! -f ${output}/bamfiles/${sample}.sorted.bam ]; then
