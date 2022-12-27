@@ -24,6 +24,13 @@ if [ ! -f ${output}/bamfiles/${sample}.sorted.bam ]; then
 fi
 
 ##########################################################
+#      Generating an fastq files from mapped reads       #
+##########################################################
+
+samtools fastq -1 ${output}/fastqfiles/${sample}_1.fq.gz -2 ${output}/fastqfiles/${sample}_2.fq.gz -@ ${cpu} -n ${output}/bamfiles/${sample}.sorted.bam
+echo "Generated FASTQ files for SRA submission"
+
+##########################################################
 #   Trim the amplification primers from alignment file   #
 ##########################################################
 
@@ -165,15 +172,6 @@ rm ${output}/vcffiles/${sample}_trimmed_union_snpEff_renamed.vcf
 ##########################################################
 
 python scripts/add_variants_tsv.py ${output}/vcffiles/${sample}_trimmed_union_snpEff.vcf  ${output}/tsvfiles/${sample}.tsv
-
-##########################################################
-#      Generating an fastq files from mapped reads       #
-##########################################################
-
-samtools fastq -1 ${output}/fastqfiles/${sample}_1.fq.gz -2 ${output}/fastqfiles/${sample}_2.fq.gz -@ ${cpu} -n ${output}/bamfiles/${sample}.trimmed.realigned.indelqual.bam
-echo "Generated FASTQ files for SRA submission"
-rm ${output}/bamfiles/${sample}.trimmed.realigned.indelqual.bam
-rm ${output}/bamfiles/${sample}.trimmed.realigned.indelqual.bam.bai
 
 ##########################################################
 #  Run Freyja on the sample using the final VCF files    #
